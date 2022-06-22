@@ -14,50 +14,57 @@ def dice_calculator(func):
 
     return wrapper
 
-
-def values_cheater(func, x):
-    score = func(x)
-    return score
-
-
-def lower_value(x):
-    d1 = random.randint(1, x)
-    d2 = random.randint(1, x)
-    print('Dice #1: {} / Dice #2: {} / Sum: {}'.format(d1, d2, d1 + d2))
-    return d2 + d1
+@dice_calculator
+def dice_throw():
+    print('Dice stopped spinning. Your turn')
 
 
-def higher_value(x):
-    d1 = random.randint(x, 6)
-    d2 = random.randint(x, 6)
-    print('Dice #1: {} / Dice #2: {} / Sum: {}'.format(d1, d2, d1 + d2))
-    return d2 + d1
+def player_dice(func):
+    '''Decorator that receives parameters'''
+
+    def wrapper(func_to_do, ref_value):
+        return func(func_to_do, ref_value)
+
+    return wrapper
+
+@player_dice
+def dice_cheat(func_to_do, ref_value):
+    if func_to_do == 'lower':
+        d1 = random.randint(1, ref_value)
+        d2 = random.randint(1, ref_value)
+        print('Your values: Dice #1: {} / Dice #2: {} / Sum: {}'.format(d1, d2, d1 + d2))
+        return d1 + d2
+    else:
+        d1 = random.randint(ref_value, 6)
+        d2 = random.randint(ref_value, 6)
+        print('Your values: Dice #1: {} / Dice #2: {} / Sum: {}'.format(d1, d2, d1 + d2))
+        return d1 + d2
 
 
-def game(ans):
-    computer_score = 0
-    player_score = 0
-    while ans == 'Y':
+def function_recall(func):
+    '''decorator that has the same name as function'''
+
+    def wrapper():
+        func()
+
+    return wrapper
+
+
+@function_recall
+def function_recall():
+    replay = 'Y'
+    while replay == 'Y':
+        player_score = 0
+        computer_score = 0
         for i in range(5):
-            @dice_calculator
-            def dice_throw():
-                print('Dice stopped spinning. Your turn')
-
             computer_score = computer_score + dice_throw()
-            print(
-                'To get a little help with your luck choose if you want'
-                ' to throw a lower value than x or higher value than x...')
-            if input() == 'lower':
-                player_score = player_score + values_cheater(lower_value, int(input()))
-            else:
-                player_score = player_score + values_cheater(higher_value, int(input()))
-        if player_score != computer_score:
-            print("You lost! to try again press Y else press N\ncomputer score: {} / player score: {}".format(
-                computer_score, player_score))
+            player_score = player_score + dice_cheat(input(), int(input()))
+        if player_score == computer_score:
+            print('You won!\nComputer_score: {} / Player_score: {}\nTo play again press Y else press N'.format(computer_score,player_score))
         else:
-            print("You won! to play again press Y else press N")
-        ans = input()
-    print("GAME END...")
+            print('You lost.\nComputer_score: {} / Player_score: {}\nTo play again press Y else press N'.format(computer_score,player_score))
+        replay = input()
+    print('GAME END...')
 
 
-game('Y')
+function_recall()
