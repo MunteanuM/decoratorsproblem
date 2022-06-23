@@ -65,6 +65,10 @@ def function_recall(func):
 
     def wrapper():
         answer = func(5)
+        if answer == 'Y':
+            print('Get ready for next round!')
+        else:
+            print('Hope you had fun see you later!')
         return answer
 
     return wrapper
